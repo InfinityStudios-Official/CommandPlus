@@ -1,0 +1,36 @@
+local powershell = {}
+local CL = require(script.Parent.Parent:WaitForChild("consoleLog"))
+
+function powershell:run(main:string, alternative, arg1, arg2, arg3, arg4, arg5, arg6)
+	if main == "" or main == nil then
+		CL:consoleLog("ERROR", "PowerShell", [[Powershell Couldn't Not execute anything;
+		no command was given after PowerShell://<?> (marked with <>)]])
+		CL:Return()
+		return
+	end
+	
+	local commands = script
+	if commands:FindFirstChild("//"..tostring(main)) then
+		local command = require(commands:WaitForChild("//"..tostring(main)))
+		command:run(alternative, arg1, arg2, arg3, arg4, arg5, arg6)
+	else
+		local _totalCrossline = ""
+		local _dump = main:split("")
+		for _, numbers in pairs(_dump) do
+			_totalCrossline = _totalCrossline.."~"
+		end
+		
+		local errorLog = tostring(main)..[[: The term ']]..tostring(main)..[[` is not recognized as the name of a cmdlet, function, script file, or operable program.
+		Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+		At line:1, char:1
+		+ ]]..tostring(main)..[[ 
+		+ ]]..tostring(_totalCrossline)..[[ 
+		    + CategoryInfo          : ObjectNotFound: (]]..tostring(main)..[[:string) [],  CommandNotFoundException
+		    + FullyQualifiedErrorId : CommandNotFoundException]]
+		
+		CL:consoleLog("ERROR", "PowerShell", errorLog)
+		CL:Return()
+	end
+end
+
+return powershell
