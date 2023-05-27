@@ -1,0 +1,36 @@
+local npm = {}
+local CL = require(script.Parent.Parent.Parent:WaitForChild("consoleLog"))
+
+function npm:run(a, arg1, arg2, arg3, arg4, arg5, arg6)
+	if a == "" or a == nil then
+		CL:consoleLog("ERROR", "PowerShell://npm", [[Powershell://npm Couldn't Not execute anything;
+		no command was given after PowerShell://npm/<?> (marked with <>)]])
+		CL:Return()
+		return
+	end
+	
+	local commands = script
+	if commands:FindFirstChild(".."..tostring(a)) then
+		local command = require(commands:WaitForChild(".."..tostring(a)))
+		command:run(a, arg1, arg2, arg3, arg4, arg5, arg6)
+	else
+		local _totalCrossline = ""
+		local _dump = a:split("")
+		for _, numbers in pairs(_dump) do
+			_totalCrossline = _totalCrossline.."~"
+		end
+
+		local errorLog = tostring(a)..[[: The term ']]..tostring(a)..[[` is not recognized as the name of a function, script file, or operable program in npm.
+		Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+		At line:1, char:2
+		+ ]]..tostring(a)..[[ 
+		+ ]]..tostring(_totalCrossline)..[[ 
+		    + CategoryInfo          : ObjectNotFound: (]]..tostring(a)..[[:string) [],  CommandNotFoundException
+		    + FullyQualifiedErrorId : CommandNotFoundException]]
+
+		CL:consoleLog("ERROR", "PowerShell://npm", errorLog)
+		CL:Return()
+	end
+end
+
+return npm
